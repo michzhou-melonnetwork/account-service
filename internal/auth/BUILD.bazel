@@ -1,0 +1,38 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "auth",
+    srcs = [
+        "api.go",
+        "middleware.go",
+        "service.go",
+    ],
+    importpath = "github.com/Melon-Network-Inc/account-service/internal/auth",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/entity",
+        "//internal/errors",
+        "//pkg/log",
+        "@com_github_dgrijalva_jwt_go//:jwt-go",
+        "@com_github_go_ozzo_ozzo_routing_v2//:ozzo-routing",
+        "@com_github_go_ozzo_ozzo_routing_v2//auth",
+    ],
+)
+
+go_test(
+    name = "auth_test",
+    srcs = [
+        "api_test.go",
+        "middleware_test.go",
+        "service_test.go",
+    ],
+    embed = [":auth"],
+    deps = [
+        "//internal/entity",
+        "//internal/errors",
+        "//internal/test",
+        "//pkg/log",
+        "@com_github_dgrijalva_jwt_go//:jwt-go",
+        "@com_github_stretchr_testify//assert",
+    ],
+)

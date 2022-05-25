@@ -1,0 +1,38 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "address",
+    srcs = [
+        "api.go",
+        "repository.go",
+        "service.go",
+    ],
+    importpath = "github.com/Melon-Network-Inc/account-service/internal/address",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/entity",
+        "//internal/errors",
+        "//pkg/dbcontext",
+        "//pkg/log",
+        "//pkg/pagination",
+        "@com_github_go_ozzo_ozzo_routing_v2//:ozzo-routing",
+        "@com_github_go_ozzo_ozzo_validation_v4//:ozzo-validation",
+    ],
+)
+
+go_test(
+    name = "address_test",
+    srcs = [
+        "api_test.go",
+        "repository_test.go",
+        "service_test.go",
+    ],
+    embed = [":address"],
+    deps = [
+        "//internal/auth",
+        "//internal/entity",
+        "//internal/test",
+        "//pkg/log",
+        "@com_github_stretchr_testify//assert",
+    ],
+)
