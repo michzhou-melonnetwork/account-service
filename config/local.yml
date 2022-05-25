@@ -1,0 +1,2 @@
+dsn: "postgres://127.0.0.1/melon_service?sslmode=disable&user=postgres&password=postgres"
+jwt_signing_key: "fake_jwt_key"

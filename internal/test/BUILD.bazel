@@ -1,0 +1,25 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "test",
+    srcs = [
+        "api.go",
+        "db.go",
+        "mock.go",
+    ],
+    importpath = "github.com/Melon-Network-Inc/account-service/internal/test",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//internal/config",
+        "//internal/errors",
+        "//pkg/accesslog",
+        "//pkg/dbcontext",
+        "//pkg/log",
+        "@com_github_go_ozzo_ozzo_dbx//:ozzo-dbx",
+        "@com_github_go_ozzo_ozzo_routing_v2//:ozzo-routing",
+        "@com_github_go_ozzo_ozzo_routing_v2//content",
+        "@com_github_go_ozzo_ozzo_routing_v2//cors",
+        "@com_github_lib_pq//:pq",
+        "@com_github_stretchr_testify//assert",
+    ],
+)

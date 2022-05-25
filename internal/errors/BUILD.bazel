@@ -1,0 +1,31 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "errors",
+    srcs = [
+        "middleware.go",
+        "response.go",
+    ],
+    importpath = "github.com/Melon-Network-Inc/account-service/internal/errors",
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "//pkg/log",
+        "@com_github_go_ozzo_ozzo_routing_v2//:ozzo-routing",
+        "@com_github_go_ozzo_ozzo_validation_v4//:ozzo-validation",
+    ],
+)
+
+go_test(
+    name = "errors_test",
+    srcs = [
+        "middleware_test.go",
+        "response_test.go",
+    ],
+    embed = [":errors"],
+    deps = [
+        "//pkg/log",
+        "@com_github_go_ozzo_ozzo_routing_v2//:ozzo-routing",
+        "@com_github_go_ozzo_ozzo_validation_v4//:ozzo-validation",
+        "@com_github_stretchr_testify//assert",
+    ],
+)
