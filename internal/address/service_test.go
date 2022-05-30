@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"testing"
+
 	"github.com/Melon-Network-Inc/account-service/internal/entity"
 	"github.com/Melon-Network-Inc/account-service/pkg/log"
 	"github.com/stretchr/testify/assert"
@@ -12,15 +13,15 @@ import (
 
 var errCRUD = errors.New("error crud")
 
-func TestCreateAddressRequest_Validate(t *testing.T) {
+func TestAddAddressRequest_Validate(t *testing.T) {
 	tests := []struct {
 		name      string
-		model     CreateAddressRequest
+		model     AddAddressRequest
 		wantError bool
 	}{
-		{"success", CreateAddressRequest{Name: "test"}, false},
-		{"required", CreateAddressRequest{Name: ""}, true},
-		{"too long", CreateAddressRequest{Name: "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"}, true},
+		{"success", AddAddressRequest{Name: "test"}, false},
+		{"required", AddAddressRequest{Name: ""}, true},
+		{"too long", AddAddressRequest{Name: "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"}, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -59,7 +60,7 @@ func Test_service_CRUD(t *testing.T) {
 	assert.Equal(t, 0, count)
 
 	// successful creation
-	address, err := s.Create(ctx, CreateAddressRequest{Name: "test"})
+	address, err := s.Add(ctx, AddAddressRequest{Name: "test"})
 	assert.Nil(t, err)
 	assert.NotEmpty(t, address.ID)
 	id := address.ID
@@ -70,18 +71,18 @@ func Test_service_CRUD(t *testing.T) {
 	assert.Equal(t, 1, count)
 
 	// validation error in creation
-	_, err = s.Create(ctx, CreateAddressRequest{Name: ""})
+	_, err = s.Add(ctx, AddAddressRequest{Name: ""})
 	assert.NotNil(t, err)
 	count, _ = s.Count(ctx)
 	assert.Equal(t, 1, count)
 
 	// unexpected error in creation
-	_, err = s.Create(ctx, CreateAddressRequest{Name: "error"})
+	_, err = s.Add(ctx, AddAddressRequest{Name: "error"})
 	assert.Equal(t, errCRUD, err)
 	count, _ = s.Count(ctx)
 	assert.Equal(t, 1, count)
 
-	_, _ = s.Create(ctx, CreateAddressRequest{Name: "test2"})
+	_, _ = s.Add(ctx, AddAddressRequest{Name: "test2"})
 
 	// update
 	address, err = s.Update(ctx, id, UpdateAddressRequest{Name: "test updated"})
@@ -137,6 +138,29 @@ func (m mockRepository) Get(ctx context.Context, id string) (entity.Address, err
 	return entity.Address{}, sql.ErrNoRows
 }
 
+func (m mockRepository) List(ctx context.Context) ([]entity.Address, error) {
+	owner := ctx.Value("user")
+	var addresses = []entity.Address{}
+	for _, item := range m.items {
+		if item.Owner == owner {
+			addresses = append(addresses, item)
+		}
+	}
+	if len(addresses) == 0 {
+		return []entity.Address{}, sql.ErrNoRows
+	}
+	return addresses, nil
+}
+
+func (m mockRepository) GetPrimaryAddress(ctx context.Context) (entity.Address, error) {
+	for _, item := range m.items {
+		if item.IsPrimary == true {
+			return item, nil
+		}
+	}
+	return entity.Address{}, sql.ErrNoRows
+}
+
 func (m mockRepository) Count(ctx context.Context) (int, error) {
 	return len(m.items), nil
 }
@@ -145,7 +169,7 @@ func (m mockRepository) Query(ctx context.Context, offset, limit int) ([]entity.
 	return m.items, nil
 }
 
-func (m *mockRepository) Create(ctx context.Context, address entity.Address) error {
+func (m *mockRepository) Add(ctx context.Context, address entity.Address) error {
 	if address.Name == "error" {
 		return errCRUD
 	}
@@ -160,6 +184,17 @@ func (m *mockRepository) Update(ctx context.Context, address entity.Address) err
 	for i, item := range m.items {
 		if item.ID == address.ID {
 			m.items[i] = address
+			break
+		}
+	}
+	return nil
+}
+
+func (m *mockRepository) UpdatePrimaryAddress(ctx context.Context, isPrimary bool) error {
+	for i, item := range m.items {
+		if item.IsPrimary == true {
+			item.UpdatePrimary(isPrimary)
+			m.items[i] = item
 			break
 		}
 	}
