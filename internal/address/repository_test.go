@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"testing"
 	"time"
+
 	"github.com/Melon-Network-Inc/account-service/internal/entity"
 	"github.com/Melon-Network-Inc/account-service/internal/test"
 	"github.com/Melon-Network-Inc/account-service/pkg/log"
@@ -24,9 +25,13 @@ func TestRepository(t *testing.T) {
 	assert.Nil(t, err)
 
 	// create
-	err = repo.Create(ctx, entity.Address{
+	err = repo.Add(ctx, entity.Address{
 		ID:        "test1",
 		Name:      "address1",
+		Owner:     "test_account",
+		Pubkey:    "9ZNTfG4NyQgxy2SWjSiQoUyBPEvXT2xo7fKc5hPYYJ7b",
+		Currency: "SOL",
+		IsPrimary: true,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	})
@@ -45,6 +50,10 @@ func TestRepository(t *testing.T) {
 	err = repo.Update(ctx, entity.Address{
 		ID:        "test1",
 		Name:      "address1 updated",
+		Owner:     "test_account",
+		Pubkey:    "9ZNTfG4NyQgxy2SWjSiQoUyBPEvXT2xo7fKc5hPYYJ7b",
+		Currency: "SOL",
+		IsPrimary: true,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	})

@@ -12,9 +12,10 @@ import (
 // Service encapsulates usecase logic for addresses.
 type Service interface {
 	Get(ctx context.Context, id string) (Address, error)
+	List(ctx context.Context) ([]Address, error)
 	Query(ctx context.Context, offset, limit int) ([]Address, error)
 	Count(ctx context.Context) (int, error)
-	Create(ctx context.Context, input CreateAddressRequest) (Address, error)
+	Add(ctx context.Context, input AddAddressRequest) (Address, error)
 	Update(ctx context.Context, id string, input UpdateAddressRequest) (Address, error)
 	Delete(ctx context.Context, id string) (Address, error)
 }
@@ -24,13 +25,16 @@ type Address struct {
 	entity.Address
 }
 
-// CreateAddressRequest represents an address creation request.
-type CreateAddressRequest struct {
-	Name string `json:"name"`
+// AddAddressRequest represents an address creation request.
+type AddAddressRequest struct {
+	Name      string `json:"name"`
+	Pubkey    string `json:"pubkey"`
+	Currency  string `json:"currency"`
+	IsPrimary bool   `json:"is_primary"`
 }
 
 // Validate validates the CreateAddressRequest fields.
-func (m CreateAddressRequest) Validate() error {
+func (m AddAddressRequest) Validate() error {
 	return validation.ValidateStruct(&m,
 		validation.Field(&m.Name, validation.Required, validation.Length(0, 128)),
 	)
@@ -38,7 +42,9 @@ func (m CreateAddressRequest) Validate() error {
 
 // UpdateAddressRequest represents an address update request.
 type UpdateAddressRequest struct {
-	Name string `json:"name"`
+	ID        string `json:"id"`
+	Name      string `json:"name"`
+	IsPrimary bool   `json:"is_primary"`
 }
 
 // Validate validates the CreateAddressRequest fields.
@@ -67,16 +73,35 @@ func (s service) Get(ctx context.Context, id string) (Address, error) {
 	return Address{address}, nil
 }
 
+// Get returns the address with the specified the address ID.
+func (s service) List(ctx context.Context) ([]Address, error) {
+	addresses, err := s.repo.List(ctx)
+	if err != nil {
+		return []Address{}, err
+	}
+	listAddresses := []Address{}
+	for _, address := range addresses {
+		listAddresses = append(listAddresses, Address{address})
+	}
+	return listAddresses, nil
+}
+
 // Create creates a new address.
-func (s service) Create(ctx context.Context, req CreateAddressRequest) (Address, error) {
+func (s service) Add(ctx context.Context, req AddAddressRequest) (Address, error) {
 	if err := req.Validate(); err != nil {
 		return Address{}, err
 	}
+	if req.IsPrimary {
+		s.repo.UpdatePrimaryAddress(ctx, false)
+	}
+
 	id := entity.GenerateID()
 	now := time.Now()
-	err := s.repo.Create(ctx, entity.Address{
+	err := s.repo.Add(ctx, entity.Address{
 		ID:        id,
 		Name:      req.Name,
+		Pubkey:    req.Pubkey,
+		IsPrimary: req.IsPrimary,
 		CreatedAt: now,
 		UpdatedAt: now,
 	})
@@ -97,6 +122,7 @@ func (s service) Update(ctx context.Context, id string, req UpdateAddressRequest
 		return address, err
 	}
 	address.Name = req.Name
+	address.IsPrimary = req.IsPrimary
 	address.UpdatedAt = time.Now()
 
 	if err := s.repo.Update(ctx, address.Address); err != nil {
