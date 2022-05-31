@@ -19,7 +19,8 @@ func RegisterHandlers(r *routing.RouteGroup, service Service, authHandler routin
 	r.Use(authHandler)
 
 	// the following endpoints require a valid JWT
-	r.Post("/addresses", res.create)
+	r.Post("/addresses", res.add)
+	r.Get("/addresses", res.list)
 	r.Put("/addresses/<id>", res.update)
 	r.Delete("/addresses/<id>", res.delete)
 }
@@ -38,6 +39,15 @@ func (r resource) get(c *routing.Context) error {
 	return c.Write(address)
 }
 
+func (r resource) list(c *routing.Context) error {
+	addresses, err := r.service.List(c.Request.Context())
+	if err != nil {
+		return err
+	}
+
+	return c.Write(addresses)
+}
+
 func (r resource) query(c *routing.Context) error {
 	ctx := c.Request.Context()
 	count, err := r.service.Count(ctx)
@@ -53,13 +63,13 @@ func (r resource) query(c *routing.Context) error {
 	return c.Write(pages)
 }
 
-func (r resource) create(c *routing.Context) error {
-	var input CreateAddressRequest
+func (r resource) add(c *routing.Context) error {
+	var input AddAddressRequest
 	if err := c.Read(&input); err != nil {
 		r.logger.With(c.Request.Context()).Info(err)
 		return errors.BadRequest("")
 	}
-	address, err := r.service.Create(c.Request.Context(), input)
+	address, err := r.service.Add(c.Request.Context(), input)
 	if err != nil {
 		return err
 	}

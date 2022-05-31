@@ -15,6 +15,7 @@ go_library(
         "//pkg/dbcontext",
         "//pkg/log",
         "//pkg/pagination",
+        "@com_github_go_ozzo_ozzo_dbx//:ozzo-dbx",
         "@com_github_go_ozzo_ozzo_routing_v2//:ozzo-routing",
         "@com_github_go_ozzo_ozzo_validation_v4//:ozzo-validation",
     ],
