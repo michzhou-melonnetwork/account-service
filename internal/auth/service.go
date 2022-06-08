@@ -7,7 +7,7 @@ import (
 	"github.com/Melon-Network-Inc/account-service/internal/entity"
 	"github.com/Melon-Network-Inc/account-service/internal/errors"
 	"github.com/Melon-Network-Inc/account-service/pkg/log"
-	"github.com/dgrijalva/jwt-go"
+	"github.com/golang-jwt/jwt"
 )
 
 // Service encapsulates the authentication logic.

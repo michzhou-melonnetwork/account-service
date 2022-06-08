@@ -5,8 +5,8 @@ package dbcontext
 import (
 	"context"
 
-	dbx "github.com/go-ozzo/ozzo-dbx"
 	routing "github.com/go-ozzo/ozzo-routing/v2"
+	dbx "github.com/go-ozzo/ozzo-dbx"
 )
 
 // DB represents a DB connection that can be used to run SQL queries.
