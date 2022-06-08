@@ -13,9 +13,9 @@ go_library(
         "//internal/entity",
         "//internal/errors",
         "//pkg/log",
-        "@com_github_dgrijalva_jwt_go//:jwt-go",
         "@com_github_go_ozzo_ozzo_routing_v2//:ozzo-routing",
         "@com_github_go_ozzo_ozzo_routing_v2//auth",
+        "@com_github_golang_jwt_jwt//:jwt",
     ],
 )
 
@@ -32,7 +32,7 @@ go_test(
         "//internal/errors",
         "//internal/test",
         "//pkg/log",
-        "@com_github_dgrijalva_jwt_go//:jwt-go",
+        "@com_github_golang_jwt_jwt//:jwt",
         "@com_github_stretchr_testify//assert",
     ],
 )

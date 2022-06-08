@@ -20,7 +20,7 @@ func TestAPI(t *testing.T) {
 			Name:      "address123",
 			Owner:     "testaccount",
 			Pubkey:    "9ZNTfG4NyQgxy2SWjSiQoUyBPEvXT2xo7fKc5hPYYJ7b",
-			Currency: "SOL",
+			Currency:  "SOL",
 			IsPrimary: true,
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),

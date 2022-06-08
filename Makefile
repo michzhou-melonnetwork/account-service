@@ -124,7 +124,7 @@ bazel-clean: ## use bazel clean to remove all bazel output folders
 
 .PHONY: bazel-run
 bazel-run: ## run bazel to start server
-	bazel run //cmd/server:main
+	bazel run //cmd/server:server
 
 .PHONY: gazelle
 gazelle: ## run gazelle to add bazel to each directory

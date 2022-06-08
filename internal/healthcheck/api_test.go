@@ -16,4 +16,3 @@ func TestAPI(t *testing.T) {
 		"ok", "GET", "/healthcheck", "", nil, http.StatusOK, `"OK 0.9.0"`,
 	})
 }
-
