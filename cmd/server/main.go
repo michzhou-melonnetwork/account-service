@@ -9,6 +9,8 @@ import (
 	"os"
 	"time"
 
+	"gorm.io/driver/postgres"
+
 	"github.com/Melon-Network-Inc/account-service/internal/address"
 	"github.com/Melon-Network-Inc/account-service/internal/auth"
 	"github.com/Melon-Network-Inc/account-service/internal/config"
@@ -22,6 +24,7 @@ import (
 	"github.com/go-ozzo/ozzo-routing/v2/content"
 	"github.com/go-ozzo/ozzo-routing/v2/cors"
 	_ "github.com/lib/pq"
+	"gorm.io/gorm"
 )
 
 // Version indicates the current version of the application.
@@ -42,7 +45,8 @@ func main() {
 	}
 
 	// connect to the database
-	db, err := dbx.MustOpen("postgres", cfg.DSN)
+	// db, err := dbx.MustOpen("postgres", cfg.DSN)
+	db, err := gorm.Open(postgres.Open(cfg.DSN), &gorm.Config{})
 	if err != nil {
 		logger.Error(err)
 		os.Exit(-1)
